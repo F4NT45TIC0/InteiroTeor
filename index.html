@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Cartório 2025 - Inteiro Teor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Inteiro Teor</h1>
+            <h2>Sistema Cartório 2025</h2>
+        </header>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="tipo">Tipo:</label>
+                <select id="tipo" required>
+                    <option value="">Selecione o tipo</option>
+                    <option value="nascimento">Nascimento</option>
+                    <option value="casamento">Casamento</option>
+                    <option value="obito">Óbito</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="anoModelo">Ano modelo:</label>
+                <select id="anoModelo" disabled>
+                    <option value="">Selecione o ano</option>
+                    <option value="1946">1946</option>
+                    <option value="1947-1976">1947-1976</option>
+                    <option value="1977-1984">1977-1984</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="escrevente">Escrevente:</label>
+                <select id="escrevente">
+                    <option value="">Selecione o escrevente</option>
+                    <option value="Amadeu">Amadeu Coelho Pedralva dos Reis</option>
+                    <option value="Oswaldo">Oswaldo Paquier</option>
+                    <option value="Yolanda">Yolanda Pereira de Souza</option>
+                    <option value="Lourdes">Lourdes Matricardi Lourenço</option>
+                    <option value="Lucio">Lucio Dias de Toledo</option>
+                    <option value="Francisco">Francisco Braga de Arruda Botelho</option>
+                    <option value="Julia">Julia Aguemi</option>
+                    <option value="Atahualpa">Atahualpa Franco de Godoy</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="averbacoes">Averbações:</label>
+                <select id="averbacoes">
+                    <option value="0">Nenhuma</option>
+                    <option value="1">1 Averbação</option>
+                    <option value="2">2 Averbações</option>
+                    <option value="3">3 Averbações</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="text-area-container">
+            <textarea id="documentText" placeholder="O texto será gerado aqui após selecionar as opções acima..." rows="10"></textarea>
+        </div>
+
+        <button id="copyButton" class="copy-button">Copy to Clipboard</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
