@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Cartório 2025 - Inteiro Teor</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
     <div class="container">
@@ -14,6 +14,7 @@
         </header>
 
         <div class="controls">
+            <!-- Existing controls -->
             <div class="control-group">
                 <label for="tipo">Tipo:</label>
                 <select id="tipo" required>
@@ -61,12 +62,19 @@
         </div>
 
         <div class="text-area-container">
-            <textarea id="documentText" placeholder="O texto será gerado aqui após selecionar as opções acima..." rows="10"></textarea>
+            <textarea id="documentText" placeholder="O texto será gerado aqui após selecionar as opções acima ou processar uma imagem..." rows="10"></textarea>
         </div>
 
-        <button id="copyButton" class="copy-button">Copy to Clipboard</button>
+        <div class="upload-section" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ccc;">
+            <label for="imageUpload">Carregar Imagem do Documento:</label>
+            <input type="file" id="imageUpload" accept="image/*" style="margin-left: 10px;">
+            <button id="processImageButton" style="margin-left: 10px;">Processar Imagem</button>
+            <div id="ocrStatus" style="margin-top: 10px; font-style: italic;"></div> <!-- To show OCR progress/status -->
+        </div>
+
+        <button id="copyButton" class="copy-button" style="margin-top: 15px;">Copiar Texto</button>
     </div>
 
-    <script src="script.js"></script>
+    <script src="/static/js/script.js"></script>
 </body>
 </html>
