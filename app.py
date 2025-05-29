@@ -109,6 +109,4 @@ def index():
     return app.send_static_file("index.html")
 
 if __name__ == "__main__":
-    # Make sure to run with host='0.0.0.0' to be accessible within the sandbox/network
-    # The port can be any available port, 5000 is common for Flask.
-    app.run(host="0.0.0.0", port=5000, debug=False) # Turn debug=False for production/sharing
+    app.run()
