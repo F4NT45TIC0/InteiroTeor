@@ -1,6 +1,8 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import logging
 import os
+import requests
+import json
 from azure.cognitiveservices.vision.computervision import ComputerVisionClient
 from azure.cognitiveservices.vision.computervision.models import OperationStatusCodes
 from msrest.authentication import CognitiveServicesCredentials
@@ -12,7 +14,10 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-app = Flask(__name__)
+# Configuração explícita do diretório static para garantir que os arquivos CSS e JS sejam servidos corretamente
+app = Flask(__name__, 
+            static_folder='static',  # Define explicitamente a pasta static
+            static_url_path='/static')  # Define explicitamente o URL path para arquivos estáticos
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -20,6 +25,10 @@ logging.basicConfig(level=logging.INFO)
 # Set up Azure Computer Vision client
 VISION_KEY = os.getenv('AZURE_VISION_KEY')
 VISION_ENDPOINT = os.getenv('AZURE_VISION_ENDPOINT')
+
+# Chave da API OpenAI (ou outro serviço de IA)
+AI_API_KEY = os.getenv('AI_API_KEY')
+AI_API_URL = os.getenv('AI_API_URL', 'https://api.openai.com/v1/chat/completions')
 
 if not VISION_KEY or not VISION_ENDPOINT:
     logging.error("Azure Computer Vision credentials not found. Make sure AZURE_VISION_KEY and AZURE_VISION_ENDPOINT are set in .env file")
@@ -37,12 +46,51 @@ def correct_text():
         return jsonify({"error": "Nenhum texto fornecido no pedido."}), 400
 
     original_text = data["text"]
-    logging.info(f"Recebido texto: {original_text[:100]}...") # Log first 100 chars
+    logging.info(f"Recebido texto para correção: {original_text[:100]}...") # Log primeiros 100 caracteres
+
+    # Verificar se a chave da API está configurada
+    if not AI_API_KEY:
+        logging.warning("Chave da API de IA não configurada. Retornando texto original.")
+        return jsonify({"corrected_text": original_text, 
+                        "warning": "Serviço de IA não configurado. Configure a chave AI_API_KEY no arquivo .env"})
 
     try:
-        # Como removemos a integração com IA, simplesmente retornamos o texto original
-        logging.info(f"Retornando texto sem processamento de IA")
-        return jsonify({"corrected_text": original_text})
+        # Preparar o prompt para a API de IA
+        prompt = f"""
+        Por favor, corrija o seguinte texto de documento cartorial, melhorando a gramática, 
+        pontuação e formatação, mantendo o estilo formal e todas as informações originais:
+
+        {original_text}
+        """
+
+        # Configurar a requisição para a API de IA (exemplo com OpenAI)
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {AI_API_KEY}"
+        }
+        
+        payload = {
+            "model": "gpt-3.5-turbo",
+            "messages": [
+                {"role": "system", "content": "Você é um assistente especializado em documentos cartoriais brasileiros, com conhecimento em gramática, pontuação e formatação de textos formais."},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.3,
+            "max_tokens": 1000
+        }
+
+        # Fazer a requisição para a API de IA
+        response = requests.post(AI_API_URL, headers=headers, json=payload)
+        response_data = response.json()
+
+        # Verificar se a resposta foi bem-sucedida
+        if response.status_code == 200 and "choices" in response_data:
+            corrected_text = response_data["choices"][0]["message"]["content"].strip()
+            logging.info(f"Texto corrigido com sucesso. Primeiros 100 caracteres: {corrected_text[:100]}...")
+            return jsonify({"corrected_text": corrected_text})
+        else:
+            logging.error(f"Erro na resposta da API de IA: {response_data}")
+            return jsonify({"error": "Erro ao processar o texto com IA", "details": response_data}), 500
 
     except Exception as e:
         logging.error(f"Erro ao processar o texto: {e}")
@@ -102,11 +150,26 @@ def process_image():
         logging.error(error_msg)
         return jsonify({"error": error_msg}), 500
 
-# Endpoint to serve the main HTML file (optional, but good practice)
+# Rota para verificar o status da API
+@app.route("/api/status", methods=["GET"])
+def api_status():
+    ai_configured = bool(AI_API_KEY)
+    vision_configured = bool(vision_client)
+    return jsonify({
+        "status": "online",
+        "ai_service_configured": ai_configured,
+        "vision_service_configured": vision_configured
+    })
+
+# Endpoint to serve the main HTML file
 @app.route("/")
 def index():
-    # This assumes your Flask app is running from the InteiroTeor-main directory
     return app.send_static_file("index.html")
 
+# Rota adicional para garantir que arquivos estáticos sejam servidos corretamente
+@app.route('/static/<path:path>')
+def serve_static(path):
+    return send_from_directory('static', path)
+
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
