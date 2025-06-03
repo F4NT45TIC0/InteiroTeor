@@ -30,23 +30,7 @@ else:
         CognitiveServicesCredentials(VISION_KEY)
     )
 
-@app.route("/correct-text", methods=["POST"])
-def correct_text():
-    data = request.get_json()
-    if not data or "text" not in data:
-        return jsonify({"error": "Nenhum texto fornecido no pedido."}), 400
-
-    original_text = data["text"]
-    logging.info(f"Recebido texto: {original_text[:100]}...") # Log first 100 chars
-
-    try:
-        # Como removemos a integração com IA, simplesmente retornamos o texto original
-        logging.info(f"Retornando texto sem processamento de IA")
-        return jsonify({"corrected_text": original_text})
-
-    except Exception as e:
-        logging.error(f"Erro ao processar o texto: {e}")
-        return jsonify({"error": f"Erro interno do servidor ao processar o texto: {e}"}), 500
+# A rota /correct-text foi movida para api/index.py
 
 @app.route("/process-image", methods=["POST"])
 def process_image():
