@@ -8,8 +8,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const imageUpload = document.getElementById('imageUpload');
     const processImageButton = document.getElementById('processImageButton');
     const ocrStatus = document.getElementById('ocrStatus');
-
-
+    
+    // Botões de formatação de texto
+    const alignLeftBtn = document.getElementById('align-left');
+    const alignCenterBtn = document.getElementById('align-center');
+    const alignRightBtn = document.getElementById('align-right');
+    const alignJustifyBtn = document.getElementById('align-justify');
+    const aiCorrectButton = document.getElementById('aiCorrectButton');
 
     // Textos base para cada tipo e ano
     const textos = {
@@ -55,10 +60,109 @@ document.addEventListener('DOMContentLoaded', function() {
                 texto += ` À margem do texto consta: ${numerais.slice(0, averbacoes).join(', ')}.`;
             }
             documentText.value = texto;
+            
+            // Manter o alinhamento atual ao atualizar o texto
+            aplicarAlinhamentoAtual();
         } else {
              documentText.value = '';
         }
     }
+
+    // Função para aplicar o alinhamento atual ao texto
+    function aplicarAlinhamentoAtual() {
+        // Encontrar o botão de alinhamento ativo
+        const botaoAtivo = document.querySelector('.formatting-group .format-btn.active');
+        if (botaoAtivo) {
+            // Aplicar o alinhamento correspondente
+            aplicarAlinhamento(botaoAtivo.id);
+        }
+    }
+
+    // Função para aplicar alinhamento ao texto
+    function aplicarAlinhamento(alinhamentoId) {
+        // Remover todas as classes de alinhamento existentes
+        documentText.classList.remove('text-left', 'text-center', 'text-right', 'text-justify');
+        
+        // Adicionar a classe de alinhamento correspondente
+        switch (alinhamentoId) {
+            case 'align-left':
+                documentText.classList.add('text-left');
+                break;
+            case 'align-center':
+                documentText.classList.add('text-center');
+                break;
+            case 'align-right':
+                documentText.classList.add('text-right');
+                break;
+            case 'align-justify':
+                documentText.classList.add('text-justify');
+                break;
+        }
+    }
+
+    // Configurar os botões de alinhamento
+    function configurarBotoesAlinhamento() {
+        const botoesAlinhamento = [alignLeftBtn, alignCenterBtn, alignRightBtn, alignJustifyBtn];
+        
+        botoesAlinhamento.forEach(botao => {
+            botao.addEventListener('click', function() {
+                // Remover a classe 'active' de todos os botões
+                botoesAlinhamento.forEach(b => b.classList.remove('active'));
+                
+                // Adicionar a classe 'active' ao botão clicado
+                this.classList.add('active');
+                
+                // Aplicar o alinhamento correspondente
+                aplicarAlinhamento(this.id);
+            });
+        });
+    }
+
+    // Inicializar os botões de alinhamento
+    configurarBotoesAlinhamento();
+
+    // Botão de correção com IA
+    aiCorrectButton.addEventListener('click', async function() {
+        if (!documentText.value.trim()) {
+            alert('Por favor, insira algum texto para corrigir.');
+            return;
+        }
+
+        ocrStatus.textContent = 'Corrigindo texto com IA...';
+        aiCorrectButton.disabled = true;
+
+        try {
+            const response = await fetch('/correct-text', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: documentText.value })
+            });
+
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.error || 'Erro ao processar o texto');
+            }
+
+            documentText.value = result.corrected_text;
+            ocrStatus.textContent = 'Texto corrigido com sucesso!';
+            
+            // Manter o alinhamento atual após a correção
+            aplicarAlinhamentoAtual();
+            
+            // Após 3 segundos, limpar a mensagem de status
+            setTimeout(() => {
+                ocrStatus.textContent = '';
+            }, 3000);
+        } catch (error) {
+            console.error('Erro:', error);
+            ocrStatus.textContent = `Erro: ${error.message}`;
+        } finally {
+            aiCorrectButton.disabled = false;
+        }
+    });
 
     copyButton.addEventListener('click', function() {
         documentText.select();
@@ -116,6 +220,9 @@ document.addEventListener('DOMContentLoaded', function() {
             documentText.value = result.text;
             ocrStatus.textContent = 'Processamento concluído com sucesso!';
             
+            // Aplicar alinhamento padrão (esquerda) ao texto processado
+            alignLeftBtn.click();
+            
             // After 3 seconds, clear the status message
             setTimeout(() => {
                 ocrStatus.textContent = '';
@@ -127,10 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } finally {
             processImageButton.disabled = false;
         }
-
     });
-
-
 
     imageUpload.addEventListener('change', function() {
         ocrStatus.textContent = '';
@@ -139,4 +243,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Aplicar alinhamento padrão (esquerda) ao carregar a página
+    alignLeftBtn.click();
 });

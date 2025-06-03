@@ -62,17 +62,54 @@
         </div>
 
         <div class="text-area-container">
+            <!-- Nova barra de formatação de texto -->
+            <div class="formatting-toolbar">
+                <!-- Grupo de botões de alinhamento -->
+                <div class="formatting-group">
+                    <button id="align-left" class="format-btn active" title="Alinhar à esquerda">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M3 5h18v2H3V5zm0 6h12v2H3v-2zm0 6h18v2H3v-2z"/>
+                        </svg>
+                    </button>
+                    <button id="align-center" class="format-btn" title="Centralizar">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M3 5h18v2H3V5zm3 6h12v2H6v-2zm-3 6h18v2H3v-2z"/>
+                        </svg>
+                    </button>
+                    <button id="align-right" class="format-btn" title="Alinhar à direita">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M3 5h18v2H3V5zm6 6h12v2H9v-2zm-6 6h18v2H3v-2z"/>
+                        </svg>
+                    </button>
+                    <button id="align-justify" class="format-btn" title="Justificar">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h18v2H3v-2z"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="separator"></div>
+                
+                <!-- Botão de IA para correção e formatação -->
+                <button id="aiCorrectButton" class="ai-button" title="Corrigir e formatar com IA">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                    </svg>
+                    Corrigir com IA
+                </button>
+            </div>
+            
             <textarea id="documentText" placeholder="O texto será gerado aqui após selecionar as opções acima ou processar uma imagem..." rows="10"></textarea>
         </div>
 
-        <div class="upload-section" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ccc;">
+        <div class="upload-section">
             <label for="imageUpload">Carregar Imagem do Documento:</label>
-            <input type="file" id="imageUpload" accept="image/*" style="margin-left: 10px;">
-            <button id="processImageButton" style="margin-left: 10px;">Processar Imagem</button>
-            <div id="ocrStatus" style="margin-top: 10px; font-style: italic;"></div> <!-- To show OCR progress/status -->
+            <input type="file" id="imageUpload" accept="image/*">
+            <button id="processImageButton">Processar Imagem</button>
+            <div id="ocrStatus"></div> <!-- Para mostrar o progresso/status do OCR -->
         </div>
 
-        <button id="copyButton" class="copy-button" style="margin-top: 15px;">Copiar Texto</button>
+        <button id="copyButton" class="copy-button">Copiar Texto</button>
     </div>
 
     <script src="/static/js/script.js"></script>
