@@ -14,7 +14,7 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 
 # Chave da API OpenAI (ou outro serviço de IA)
-AI_API_KEY = os.getenv('AI_API_KEY')
+AI_API_KEY = os.getenv('AI_API_KEY', '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')
 AI_API_URL = os.getenv('AI_API_URL', 'https://api.openai.com/v1/chat/completions')
 
 @app.route("/correct-text", methods=["POST"])
